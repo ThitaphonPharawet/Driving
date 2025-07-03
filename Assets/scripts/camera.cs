@@ -2,18 +2,45 @@ using UnityEngine;
 
 public class cam : MonoBehaviour
 {
-    GameObject player;
-    Vector3 offset;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Transform player;
+    public Vector3 thirdPersonOffset = new Vector3(0, 5, -10);
+    public Vector3 firstPersonOffset = new Vector3(0, 2.0f, 0.5f);
+
+    private bool isFirstPerson = false;
+
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
-        offset = transform.position - player.transform.position;
+        if (player == null)
+        {
+            GameObject playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+                player = playerObj.transform;
+        }
     }
 
-    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            isFirstPerson = !isFirstPerson;
+        }
+    }
+
     void LateUpdate()
     {
-        transform.position = player.transform.position + offset;
+        if (player == null) return;
+
+        if (isFirstPerson)
+        {
+            // มุมมองคนขับ
+            transform.position = player.position + player.TransformDirection(firstPersonOffset);
+            transform.rotation = player.rotation;
+        }
+        else
+        {
+            // มุมมองด้านหลัง (บุคคลที่สาม)
+            transform.position = player.position + thirdPersonOffset;
+            transform.LookAt(player);
+        }
     }
 }
